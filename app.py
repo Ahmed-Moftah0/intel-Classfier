@@ -7,13 +7,24 @@ app = Flask(__name__)
 
 def preprossing(image):
     image=Image.open(image)
-    image = image.resize((150, 150))
-    image_arr = np.array(image.convert('RGB'))
-    image_arr.shape = (1, 150, 150, 3)
-    return image_arr
+    image = image.resize((256, 256))
+    image = np.expand_dims(image, 0)
+    # image_arr = np.array(image.convert('RGB'))
+    # image_arr.shape = (1, 150, 150, 3)
+    return image
 
-classes = ['Buildings' ,'Forest', 'Glacier' ,'Mountain' ,'Sea' ,'Street']
-model=load_model("Intel_Image_Classification.h5")
+classes =['Tomato___Bacterial_spot',
+ 'Tomato___Early_blight',
+ 'Tomato___Late_blight',
+ 'Tomato___Leaf_Mold',
+ 'Tomato___Septoria_leaf_spot',
+ 'Tomato___Spider_mites Two-spotted_spider_mite',
+ 'Tomato___Target_Spot',
+ 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
+ 'Tomato___Tomato_mosaic_virus',
+ 'Tomato___healthy']
+
+model=load_model("TomatoeFinal.h5")
 
 @app.route('/')
 def index():
@@ -34,8 +45,9 @@ def api():
         print("Model predicted")
         ind = np.argmax(result)
         prediction = classes[ind]
+        confidence = round(100 * (np.max(prediction[0])), 2)
         print(prediction)
-        return jsonify({'prediction': prediction})
+        return jsonify({'prediction': prediction,'confidence':confidence})
     except:
         return jsonify({'Error': 'Error occur'})
 
